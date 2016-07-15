@@ -16,8 +16,9 @@ package="com.example.arush.customtrackertest">
 
     <service android:name=".LocationService" android:enabled="true" android:exported="true"></service>
 
-    <receiver android:name="com.example.arush.customtrackertest.LocationReceiver" android:exported="true"
-        android:enabled="true">
+    <receiver
+        android:name="com.example.arush.customtrackertest.LocationReceiver"
+        android:exported="true">
         <intent-filter>
             <action android:name="android.intent.action.BOOT_COMPLETED">
             </action>

@@ -7,30 +7,46 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.SystemClock;
+import android.widget.Toast;
 
 public class LocationReceiver extends BroadcastReceiver {
     private int INTERVAL;
-    public LocationReceiver() {
-    }
+    AlarmManager alarmManager;
+    PendingIntent wakeupIntent;
+    Context context;
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        INTERVAL = 2*60*1000;
-        final AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        final PendingIntent wakeupIntent = PendingIntent.getService(context, 0,
+        INTERVAL = 1 * 60 * 1000;
+        this.context = context;
+        Toast.makeText(context, "activated broadband receiver", Toast.LENGTH_LONG).show();
+
+        alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+        wakeupIntent = PendingIntent.getService(context, 0,
                 new Intent(context, LocationService.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
         final boolean hasNetwork = !intent.getBooleanExtra(ConnectivityManager.EXTRA_NO_CONNECTIVITY, false);
         if (hasNetwork) {
-            // start service now for doing once
-            context.startService(new Intent(context, LocationService.class));
 
-            // schedule service for every 15 minutes
+            // start service now for doing once
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + INTERVAL,
                     INTERVAL, wakeupIntent);
+            Intent serviceIntent = new Intent(context, LocationService.class);
+            context.startService(serviceIntent);
+
+            // schedule service for every 15 minutes
         } else {
+            alarmManager.cancel(wakeupIntent);
+        }
+
+    }
+
+    public void cancelAlarm() {
+        if (alarmManager!= null) {
+            Toast.makeText(context, "cancel alarms", Toast.LENGTH_LONG).show();
             alarmManager.cancel(wakeupIntent);
         }
     }
 }
+

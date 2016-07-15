@@ -40,7 +40,6 @@ public class LocationService extends Service implements LocationListener, Google
     private GoogleApiClient client;
     private static PriorityQueue<Location> storage;
     private LocationRequest request;
-    private PowerManager.WakeLock wakeLock;
 
     static {
         state = State.IDLE;
@@ -48,13 +47,9 @@ public class LocationService extends Service implements LocationListener, Google
     }
     public void onCreate() {
         super.onCreate();
+        Toast.makeText(getBaseContext(), "location service started", Toast.LENGTH_LONG);
 
-        final PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        this.wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "LocationService");
 
-        INTERVAL = 10000;
-        createLocationRequest();
-        initGoogleAPIClient();
     }
 
     @Override
@@ -106,7 +101,6 @@ public class LocationService extends Service implements LocationListener, Google
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
 
             if (lastLocation != null) {
-                storage.add(lastLocation);
                 Toast.makeText(this,"Latitude: " + lastLocation.getLatitude(), Toast.LENGTH_LONG).show();
                 sendToServer(lastLocation);
             }
@@ -137,20 +131,17 @@ public class LocationService extends Service implements LocationListener, Google
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (state == State.IDLE) {
             state = State.WORKING;
-            this.wakeLock.acquire();
-            // register location updates, not gonna code it you know
-
+            INTERVAL = 10000;
+            createLocationRequest();
+            initGoogleAPIClient();
         }
         return START_STICKY;
     }
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
         state = State.IDLE;
-        if (this.wakeLock.isHeld()) {
-            this.wakeLock.release();
-        }
+        super.onDestroy();
     }
 
     private void sendToServer(Location location) {

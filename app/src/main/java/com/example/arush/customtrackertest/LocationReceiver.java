@@ -17,7 +17,8 @@ public class LocationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        INTERVAL = 1 * 60 * 1000;
+        Preferences prefs = new Preferences(context);
+        INTERVAL = (Integer) prefs.getValue(Preferences.INTERVAL);
         this.context = context;
         Toast.makeText(context, "activated broadband receiver", Toast.LENGTH_LONG).show();
 

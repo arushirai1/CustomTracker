@@ -43,7 +43,8 @@ public class MainActivity extends AppCompatActivity {
 
         coordinates = (TextView) findViewById(R.id.coordinate_text);
         timestamp = (TextView) findViewById(R.id.timestamp_text);
-        receiver = new LocationReceiver();
+        receiver = new  LocationReceiver();
+        final Preferences prefs = new Preferences(this);
 
         int permissionCheck = ContextCompat.checkSelfPermission(MainActivity.this,
                 Manifest.permission.ACCESS_FINE_LOCATION);
@@ -56,10 +57,12 @@ public class MainActivity extends AppCompatActivity {
         }
 
         enabler_switch = (Switch) findViewById(R.id.enabler_switch);
-        enabler_switch.setChecked(false);
+        enabler_switch.setChecked((Boolean) prefs.getValue(Preferences.BACKGROUND_MONITER));
         enabler_switch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                prefs.setValue(Preferences.BACKGROUND_MONITER, isChecked);
+
                 if (isChecked){
                     PackageManager pm  = MainActivity.this.getPackageManager();
                     ComponentName componentName = new ComponentName(MainActivity.this, LocationReceiver.class);
@@ -88,4 +91,5 @@ public class MainActivity extends AppCompatActivity {
         intent.setAction("com.example.arush.customtrackertest.LocationReciever");
         sendBroadcast(intent);
     }
+
 }

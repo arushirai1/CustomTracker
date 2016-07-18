@@ -21,11 +21,12 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.PriorityQueue;
-import java.util.Queue;
 
 import static com.google.android.gms.location.LocationServices.API;
 
@@ -40,6 +41,7 @@ public class LocationService extends Service implements LocationListener, Google
     private GoogleApiClient client;
     private static PriorityQueue<Location> storage;
     private LocationRequest request;
+    private FirebaseDatabase database;
 
     static {
         state = State.IDLE;
@@ -47,9 +49,8 @@ public class LocationService extends Service implements LocationListener, Google
     }
     public void onCreate() {
         super.onCreate();
+        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
         Toast.makeText(getBaseContext(), "location service started", Toast.LENGTH_LONG);
-
-
     }
 
     @Override
@@ -146,6 +147,10 @@ public class LocationService extends Service implements LocationListener, Google
 
     private void sendToServer(Location location) {
         // send to server in background thread. start AsyncTask here
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference myRef = database.getReference("message");
+
+        myRef.setValue("Hello, World!");
         Toast.makeText(this, "sent to server", Toast.LENGTH_LONG).show();
         onSendingFinished();
     }

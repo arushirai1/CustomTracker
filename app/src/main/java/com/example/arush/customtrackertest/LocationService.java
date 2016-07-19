@@ -26,6 +26,8 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.PriorityQueue;
 
 import static com.google.android.gms.location.LocationServices.API;
@@ -42,15 +44,27 @@ public class LocationService extends Service implements LocationListener, Google
     private static PriorityQueue<Location> storage;
     private LocationRequest request;
     private FirebaseDatabase database;
+    private Map<String, User> users;
 
     static {
         state = State.IDLE;
         storage = new PriorityQueue<>();
     }
+
+    private static class User{
+        double lastLat;
+        double lastLong;
+        String timestamp;
+
+        public User(double lat, double longitude, String timestamp) {
+            lastLat = lat;
+            lastLong = longitude;
+            this.timestamp = timestamp;
+        }
+    };
+
     public void onCreate() {
         super.onCreate();
-        DatabaseReference rootRef = FirebaseDatabase.getInstance().getReference();
-        Toast.makeText(getBaseContext(), "location service started", Toast.LENGTH_LONG);
     }
 
     @Override
@@ -102,8 +116,9 @@ public class LocationService extends Service implements LocationListener, Google
             Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(client);
 
             if (lastLocation != null) {
-                Toast.makeText(this,"Latitude: " + lastLocation.getLatitude(), Toast.LENGTH_LONG).show();
-                sendToServer(lastLocation);
+                Preferences prefs = new Preferences(getApplicationContext());
+                users.put((String) prefs.getValue(prefs.LICENSE_PLATE_NUM), new User(lastLocation.getLatitude(), lastLocation.getLongitude(), getCurrentTimeStamp()));
+                sendToServer();
             }
             else {
                 Toast.makeText(this, "no location detected", Toast.LENGTH_LONG).show();
@@ -135,6 +150,7 @@ public class LocationService extends Service implements LocationListener, Google
             INTERVAL = 10000;
             createLocationRequest();
             initGoogleAPIClient();
+            users = new HashMap<>();
         }
         return START_STICKY;
     }
@@ -145,17 +161,17 @@ public class LocationService extends Service implements LocationListener, Google
         super.onDestroy();
     }
 
-    private void sendToServer(Location location) {
-        // send to server in background thread. start AsyncTask here
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference myRef = database.getReference("message");
-
-        myRef.setValue("Hello, World!");
+    private void sendToServer() {
+        DatabaseReference myRef = FirebaseDatabase.getInstance().getReference();
+        DatabaseReference usersRef = myRef.child("Users");
+        usersRef.setValue(users);
         Toast.makeText(this, "sent to server", Toast.LENGTH_LONG).show();
         onSendingFinished();
     }
 
     private void onSendingFinished() {
-       this.stopSelf(); //stopSelf will call onDestroy and the WakeLock releases.
+        this.stopSelf(); //stopSelf will call onDestroy and the WakeLock releases.
     }
+
 }
+

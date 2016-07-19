@@ -26,7 +26,7 @@ public class Preferences {
     static {
         DEFAULT_VALUES = new HashMap<>();
 
-        DEFAULT_VALUES.put(LICENSE_PLATE_NUM, "XX-XXXXXX");
+        DEFAULT_VALUES.put(LICENSE_PLATE_NUM, "XXXXXXXX");
         DEFAULT_VALUES.put(INTERVAL,1*60*1000);
         DEFAULT_VALUES.put(BACKGROUND_MONITER, false);
         DEFAULT_VALUES.put(MAXIMUM_ENTRIES, 5);

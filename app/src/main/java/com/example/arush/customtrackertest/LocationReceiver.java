@@ -33,8 +33,8 @@ public class LocationReceiver extends BroadcastReceiver {
             alarmManager.setInexactRepeating(AlarmManager.ELAPSED_REALTIME_WAKEUP,
                     SystemClock.elapsedRealtime() + INTERVAL,
                     INTERVAL, wakeupIntent);
-            Intent serviceIntent = new Intent(context, LocationService.class);
-            context.startService(serviceIntent);
+            //Intent serviceIntent = new Intent(context, LocationService.class);
+            //context.startService(serviceIntent);
 
             // schedule service for every 15 minutes
         } else {

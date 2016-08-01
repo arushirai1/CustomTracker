@@ -26,8 +26,7 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.firebase.FirebaseApp;
-import com.google.firebase.database.FirebaseDatabase;
+//import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -37,13 +36,13 @@ import static com.google.android.gms.location.LocationServices.*;
 public class MainActivity extends AppCompatActivity {
     public static TextView coordinates, timestamp;
     private Switch enabler_switch;
-    private LocationReceiver receiver;
+    public static LocationReceiver receiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+        //FirebaseDatabase.getInstance().setPersistenceEnabled(true);
 
         coordinates = (TextView) findViewById(R.id.coordinate_text);
         timestamp = (TextView) findViewById(R.id.timestamp_text);
@@ -81,7 +80,8 @@ public class MainActivity extends AppCompatActivity {
                     ComponentName componentName = new ComponentName(MainActivity.this, LocationReceiver.class);
                     pm.setComponentEnabledSetting(componentName, PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
                             PackageManager.DONT_KILL_APP);
-                    receiver.cancelAlarm();
+                    receiver.cancelAlarm_GCS();
+                    receiver.cancelAlarm_LS();
                     Toast.makeText(getApplicationContext(), "cancelled", Toast.LENGTH_LONG).show();
 
                 }
